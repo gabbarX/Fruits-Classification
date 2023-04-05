@@ -20,12 +20,15 @@ df = pd.read_csv("train.csv")
 labelEncoder = preprocessing.LabelEncoder()
 df["category"] = labelEncoder.fit_transform(df["category"])
 
-X = df.drop(["category"], axis=1)
+X = df.drop(["category", "ID"], axis=1)
 y = df["category"]
 
-# print(X.shape)
+X = X.values
+y = y.values
+
+# print(X)
 # Applied PCA to the data
-pca = PCA(n_components=12)
+pca = PCA(n_components=X.shape[0])
 X = pca.fit_transform(X, y)
 # print(X)
 # print(y)
@@ -33,6 +36,8 @@ X = pca.fit_transform(X, y)
 x_train, x_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42
 )
+
+# print(x_train)
 
 knn = KNeighborsClassifier(5)
 knn.fit(x_train, y_train)
