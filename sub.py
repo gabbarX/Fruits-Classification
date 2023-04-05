@@ -28,36 +28,28 @@ y = y.values
 
 # print(X)
 # Applied PCA to the data
-pca = PCA(n_components=X.shape[0])
-X = pca.fit_transform(X, y)
+# pca = PCA(n_components=X.shape[0])
+# X = pca.fit_transform(X, y)
 # print(X)
 # print(y)
 
-x_train, x_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
 
-
+df_test = pd.read_csv("test.csv")
+df_test = df_test.drop(["ID"], axis=1)
+X_test = df_test.values
+# print(X_test)
 # Applying knn
 knn = KNeighborsClassifier(1)
-knn.fit(x_train, y_train)
-y_pred = knn.predict(x_test)
-print(f"Accuracy: {accuracy_score(y_test, y_pred)}")
-
-# print(y_pred)
+knn.fit(X, y)
 
 
-# print()
-# clf = LocalOutlierFactor(n_neighbors=20, contamination=0.1)
-# y_pred = clf.fit_predict(X)
-# plot the results
+# pca = PCA(n_components=X_test.shape[0])
+# X_test = pca.fit_transform(X_test)
 
-# plt.scatter(X[:, 0], X[:, 1], c=y_pred, cmap="viridis")
-# plt.show()
-# print(df.isnull().sum())
-# kmeans = KMeans(n_clusters=3, random_state=0).fit(X)
-# print(kmeans.labels_.shape)
-# print(kmeans.cluster_centers_)
-# print(df.head())
-# print(df.describe)
-# print(X)
+y_pred = knn.predict(X_test)
+
+
+hehe = labelEncoder.inverse_transform(y_pred)
+final_df = pd.DataFrame(hehe)
+# print(hehe)
+final_df.to_csv("file1.csv")
