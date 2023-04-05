@@ -1,3 +1,5 @@
+from sklearn.cluster import SpectralClustering
+import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score
 from sklearn.cluster import KMeans
@@ -7,12 +9,15 @@ from sklearn.neighbors import LocalOutlierFactor
 import matplotlib.pyplot as plt
 from sklearn import preprocessing
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.decomposition import PCA
 
 
 df = pd.read_csv("train.csv")
-lda = LinearDiscriminantAnalysis()
 
+# print(np.asarray(df))
+# print(df.columns["category"].unique())
+# print(df["category"])
+# del df[df.columns[0]]
 
 labelEncoder = preprocessing.LabelEncoder()
 df["category"] = labelEncoder.fit_transform(df["category"])
@@ -23,21 +28,9 @@ y = df["category"]
 X = X.values
 y = y.values
 
-
-# lda.fit(X, y)
-# X = lda.transform(X)
-X = lda.fit_transform(X, y)
-
 # print(X)
-# print(y)
+# Applied PCA to the data
+pca = PCA(n_components=X.shape[0])
+X = pca.fit_transform(X, y)
 
-x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-
-
-# Applying knn
-knn = KNeighborsClassifier(5)
-knn.fit(x_train, y_train)
-y_pred = knn.predict(x_test)
-print(f"Accuracy: {accuracy_score(y_test, y_pred)}")
-
-# print(y_pred)
+# Generate some random data
