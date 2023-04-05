@@ -7,6 +7,8 @@ from sklearn.neighbors import LocalOutlierFactor
 import matplotlib.pyplot as plt
 from sklearn import preprocessing
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.decomposition import PCA
+
 
 df = pd.read_csv("train.csv")
 
@@ -21,14 +23,16 @@ df["category"] = labelEncoder.fit_transform(df["category"])
 X = df.drop(["category"], axis=1)
 y = df["category"]
 
-
+# print(X.shape)
+# Applied PCA to the data
+pca = PCA(n_components=12)
+X = pca.fit_transform(X, y)
 # print(X)
 # print(y)
 
 x_train, x_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42
 )
-
 
 knn = KNeighborsClassifier(5)
 knn.fit(x_train, y_train)
