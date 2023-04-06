@@ -4,6 +4,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 from sklearn.cluster import KMeans
 import numpy as np
+from sklearn.neighbors import LocalOutlierFactor
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import LocalOutlierFactor
 import matplotlib.pyplot as plt
@@ -15,14 +16,21 @@ from sklearn.decomposition import PCA
 df = pd.read_csv("train.csv")
 scalar = StandardScaler()
 labelEncoder = preprocessing.LabelEncoder()
+lof = LocalOutlierFactor(n_neighbors = 2)
+
 df["category"] = labelEncoder.fit_transform(df["category"])
 
 X = df.drop(["category", "ID"], axis=1)
 y = df["category"]
 
 X = X.values
-# X = scalar.fit_transform(X, y)
 y = y.values
+
+y_pred = lof.fit_predict(X)
+x_train = X[y_pred != -1]
+y_train = y[y_pred != -1]
+
+
 
 df_test = pd.read_csv("test.csv")
 df_test = df_test.drop(["ID"], axis=1)
@@ -42,7 +50,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 
 lr = LogisticRegression(max_iter=1000)
-lr.fit(X, y)
+lr.fit(x_train, y_train)
 
 # Step 6: Evaluate the model
 y_pred = lr.predict(X_test)
