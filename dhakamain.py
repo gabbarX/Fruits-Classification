@@ -10,14 +10,14 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LogisticRegression
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, StandardScaler
-from sklearn.ensemble import IsolationForest
 
 
 df = pd.read_csv("train.csv")
+lda = LinearDiscriminantAnalysis()
 
-from sklearn.ensemble import RandomForestClassifier
 
-rf_clf = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=1)
+scalar = StandardScaler()
+
 
 labelEncoder = preprocessing.LabelEncoder()
 df["category"] = labelEncoder.fit_transform(df["category"])
@@ -27,37 +27,17 @@ y = df["category"]
 
 X = X.values
 
-# X = scalar.fit_transform(X, y)
+X = scalar.fit_transform(X, y)
 y = y.values
 
+x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-n_components = 450
-pca = PCA(n_components=n_components)
-X = pca.fit_transform(X)
+lof = LocalOutlierFactor(n_neighbors=120)
+y_pred = lof.fit_predict(X)
+x_train = X[y_pred != -1]
+y_train = y[y_pred != -1]
 
-lda = LinearDiscriminantAnalysis()
-X = lda.fit_transform(X, y)
-
-# knn = KNeighborsClassifier(n_neighbors=30)
-# knn.fit(X, y)
-# cluster_labels = knn.predict(X)
-# X = np.hstack((X, cluster_labels.reshape(-1, 1)))
-
-x_train, x_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
-
-
-# iso = IsolationForest(
-#     n_estimators=100, max_samples="auto", contamination="auto", random_state=42
-# )
-# y_pred = iso.fit_predict(X)
-# x_train = X[y_pred != -1]
-# y_train = y[y_pred != -1]
-
-
-lr = LogisticRegression(max_iter=10000)
-rf_clf.fit(x_train, y_train)
+lr = LogisticRegression(max_iter=1500)
 
 lr.fit(x_train, y_train)
 
