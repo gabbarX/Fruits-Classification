@@ -11,13 +11,11 @@ from sklearn.decomposition import PCA
 from sklearn.linear_model import LogisticRegression
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, StandardScaler
 from sklearn.ensemble import IsolationForest
-
+from sklearn.ensemble import RandomForestClassifier
 
 df = pd.read_csv("train.csv")
 
-from sklearn.ensemble import RandomForestClassifier
-
-rf_clf = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=1)
+# rf_clf = RandomForestClassifier(n_estimators=2700, max_depth=109, random_state=42)
 
 labelEncoder = preprocessing.LabelEncoder()
 df["category"] = labelEncoder.fit_transform(df["category"])
@@ -57,11 +55,10 @@ x_train, x_test, y_train, y_test = train_test_split(
 
 
 lr = LogisticRegression(max_iter=10000)
-rf_clf.fit(x_train, y_train)
+# rf_clf.fit(x_train, y_train)
 
 lr.fit(x_train, y_train)
-
-y_pred = lr.predict(x_test)
+# y_pred = rf_clf.predict(x_test)
 
 accuracy = accuracy_score(y_test, y_pred)
-print("AccuracyLOFLR:", accuracy)
+print("AccuracyLOFRF:", accuracy)

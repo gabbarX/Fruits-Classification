@@ -1,6 +1,6 @@
 import pandas as pd
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, StandardScaler
-from sklearn.ensemble import IsolationForest
+from sklearn.ensemble import IsolationForest, RandomForestClassifier
 from sklearn.feature_selection import VarianceThreshold
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
@@ -36,7 +36,7 @@ X = X[y_pred != -1]
 y = y[y_pred != -1]
 
 
-n_components = 520
+n_components = 450
 pca = PCA(n_components=n_components)
 pca.fit(X)
 X = pca.transform(X)
@@ -94,6 +94,8 @@ logisticRiter = 1500
 
 log_reg = LogisticRegression(max_iter=logisticRiter)
 
+
+# rf_clf = RandomForestClassifier(n_estimators=2700, max_depth=109, random_state=42)
 # define the number of folds
 k = 5
 
@@ -101,6 +103,9 @@ k = 5
 cv = KFold(n_splits=k, shuffle=True, random_state=42)
 
 # perform cross-validation
+# scores = cross_val_score(log_reg, X, y, cv=cv)
+
+
 scores = cross_val_score(log_reg, X, y, cv=cv)
 
 # print the mean and standard deviation of the scores
