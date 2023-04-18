@@ -1,64 +1,85 @@
 import pandas as pd
-from sklearn.metrics import accuracy_score
-from sklearn.cluster import KMeans
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.neighbors import LocalOutlierFactor
-import matplotlib.pyplot as plt
-from sklearn import preprocessing
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.decomposition import PCA
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.linear_model import LogisticRegression
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, StandardScaler
-from sklearn.ensemble import IsolationForest
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+from sklearn.neighbors import KNeighborsClassifier, LocalOutlierFactor
+from sklearn.model_selection import KFold, cross_val_score
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.decomposition import PCA
 
 df = pd.read_csv("train.csv")
+labelEncoder = LabelEncoder()
+lof = LocalOutlierFactor(n_neighbors=120)
 
-# rf_clf = RandomForestClassifier(n_estimators=2700, max_depth=109, random_state=42)
-
-labelEncoder = preprocessing.LabelEncoder()
 df["category"] = labelEncoder.fit_transform(df["category"])
 
 X = df.drop(["category", "ID"], axis=1)
 y = df["category"]
 
 X = X.values
-
-# X = scalar.fit_transform(X, y)
 y = y.values
 
+# Applying Knn to have cluster labels as external features
+knn = KNeighborsClassifier(n_neighbors=30)
+knn.fit(X, y)
+cluster_labels = knn.predict(X)
+X = np.hstack((X, cluster_labels.reshape(-1, 1)))
 
+# Applying PCA on the data to reduce dimension of the data
 n_components = 450
 pca = PCA(n_components=n_components)
-X = pca.fit_transform(X)
+pca.fit(X)
+X = pca.transform(X)
 
+# Applying LDA on the data to increase between class seperation
 lda = LinearDiscriminantAnalysis()
-X = lda.fit_transform(X, y)
-
-# knn = KNeighborsClassifier(n_neighbors=30)
-# knn.fit(X, y)
-# cluster_labels = knn.predict(X)
-# X = np.hstack((X, cluster_labels.reshape(-1, 1)))
-
-x_train, x_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+lda.fit(X, y)
+X = lda.transform(X)
 
 
-# iso = IsolationForest(
-#     n_estimators=100, max_samples="auto", contamination="auto", random_state=42
-# )
-# y_pred = iso.fit_predict(X)
-# x_train = X[y_pred != -1]
-# y_train = y[y_pred != -1]
+# Applying LOF on the data in order to remove the outliers
+y_pred = lof.fit_predict(X)
+x_train = X[y_pred != -1]
+y_train = y[y_pred != -1]
+
+
+# reading the test data
+df_test = pd.read_csv("test.csv")
+df_test = df_test.drop(["ID"], axis=1)
+X_test = df_test.values
+
+# using cluster labels as external features
+cluster_labels = knn.predict(X_test)
+X_test = np.hstack((X_test, cluster_labels.reshape(-1, 1)))
+
+
+# applying PCA and LDA on the test data
+X_test = pca.transform(X_test)
+X_test = lda.transform(X_test)
+
+
+# Create a logistic regression model
+lr = LogisticRegression()
 
 
 lr = LogisticRegression(max_iter=10000)
-# rf_clf.fit(x_train, y_train)
 
+cv = KFold(n_splits=5, shuffle=True, random_state=42)
+
+scores = cross_val_score(lr, X, y, cv=cv)
+
+# print the mean and standard deviation of the scores
+print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std()))
+
+
+# Fit the model on the training data
 lr.fit(x_train, y_train)
-# y_pred = rf_clf.predict(x_test)
 
-accuracy = accuracy_score(y_test, y_pred)
-print("AccuracyLOFRF:", accuracy)
+# Make predictions on the test data
+y_pred = lr.predict(X_test)
+
+hehe = labelEncoder.inverse_transform(y_pred)
+final_df = pd.DataFrame(hehe)
+final_df.to_csv("ankitsub3.csv")
