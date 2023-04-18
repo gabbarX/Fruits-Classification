@@ -36,20 +36,20 @@ X = X[y_pred != -1]
 y = y[y_pred != -1]
 
 
-n_components = 450
-pca = PCA(n_components=n_components)
-pca.fit(X)
-X = pca.transform(X)
+# n_components = 450
+# pca = PCA(n_components=n_components)
+# pca.fit(X)
+# X = pca.transform(X)
 
 lda = LinearDiscriminantAnalysis()
 lda.fit(X, y)
 X = lda.transform(X)
 
-# kmeancluster = 35
-# knn = KNeighborsClassifier(n_neighbors=30)
-# knn.fit(X, y)
-# cluster_labels = knn.predict(X)
-# X = np.hstack((X, cluster_labels.reshape(-1, 1)))
+
+knn = KNeighborsClassifier(n_neighbors=30)
+knn.fit(X, y)
+cluster_labels = knn.predict(X)
+X = np.hstack((X, cluster_labels.reshape(-1, 1)))
 
 
 # kmeans = KMeans(n_clusters=kmeancluster, random_state=42)
@@ -81,7 +81,7 @@ print(df_test.head)
 
 
 X_test = df_test.values
-X_test = pca.transform(X_test)
+# X_test = pca.transform(X_test)
 X_test = lda.transform(X_test)
 
 
