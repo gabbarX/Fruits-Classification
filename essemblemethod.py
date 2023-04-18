@@ -41,6 +41,14 @@ lda = LinearDiscriminantAnalysis()
 lda.fit(X, y)
 X = lda.transform(X)
 
+# # Applying Isolation Forest on the data in order to remove the outliers
+# iso = IsolationForest(
+#     n_estimators=100, max_samples="auto", contamination="auto", random_state=42
+# )
+# y_pred = iso.fit_predict(X)
+# x_train = X[y_pred != -1]
+# y_train = y[y_pred != -1]
+
 # Applying LOF on the data in order to remove the outliers
 lof = LocalOutlierFactor(n_neighbors=120)
 y_pred = lof.fit_predict(X)
