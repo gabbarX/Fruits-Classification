@@ -6,6 +6,6 @@ This is a predictive machine learning model to classify data into multiple categ
 
 This model uses essemble methods to increase the accuracy. Essemble methods are used in order to prevent overfitting to the data and increase accuracy. The provided "train.csv" consisted of 20 class labels and 4096 features. We used those features along with various techniques to achieve the current accuracy. The model uses various python libraries such as pandas, scikit learn and numpy in order to perform the required actions. The file "essemblemethod.py" is the file that provided us with highest accuracy for our model.
 
-## results
+## Results
 
 The trained model achieved an accuracy of 99% on the test dataset, demonstrating its effectiveness in classifying fruits accurately.
